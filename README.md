@@ -1,0 +1,1 @@
+# Visions, Chapter III — static site
