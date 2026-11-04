@@ -307,6 +307,35 @@ code {
   text-align: left;
 }
 
+/* An opt-in blinking cursor for a terminal block that ends on a live prompt.
+   A generated inline-block, sized in `em` so it tracks the monospace text at
+   any viewport, rather than a block glyph like U+2588 — the glyph's height and
+   baseline vary with whichever font in the stack actually resolves. */
+.terminal--prompt > code::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  margin-left: 0.15em;
+  /* An empty inline-block takes its bottom margin edge as its baseline, so a
+     numeric vertical-align offsets the cursor from the text baseline directly.
+     `text-bottom` instead aligns it to the bottom of the content area, which
+     includes the font's descender, leaving the cursor hanging ~0.2em low. The
+     small negative value lets it dip just under the baseline the way a real
+     terminal cell does; nudge it toward 0 to sit the cursor exactly on it. */
+  vertical-align: -0.125em;
+  background-color: var(--primary);
+  animation: cursor-blink 1.1s steps(1, end) infinite;
+}
+
+/* steps(1, end) holds each value for its whole interval, so this is a hard
+   on/off square wave rather than a fade. */
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 .note {
   font-size: 0.875rem;
   color: var(--muted-foreground);
@@ -544,5 +573,11 @@ code {
   }
   html {
     scroll-behavior: auto !important;
+  }
+  /* The rule above crushes every duration to 0.01ms; for an infinite blink
+     that is a strobe, not a stillness. Park the cursor on, solid. */
+  .terminal--prompt > code::after {
+    animation: none !important;
+    opacity: 1;
   }
 }
